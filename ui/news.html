@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>News</title>
+    <script src="news.js"></script>
+    <style>
+      * { box-sizing: border-box; }
+      h1 { text-align: right; }
+      #list { float: right; width: 44%; }
+      #list { padding: 0; list-style: none; }
+      #list li.current { background: #cfc; }
+      #list li:hover { background: #ccf; cursor: pointer; }
+      #controls { margin-bottom: 2em; }
+    </style>
+  </head>
+  <body>
+    <h1>News</h1>
+    <ul id="list"></ul>
+    <div id="controls">
+      <button data-action="flag-read">Flag read</button>
+      <button data-action="push-to-stack">Push to stack</button>
+    </div>
+    <div id="content"></div>
+  </body>
+</html>
