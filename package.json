@@ -6,7 +6,8 @@
   "dependencies": {
     "levelup": "*",
     "leveldown": "*",
-    "feed-read": "*",
-    "uuid": "*"
+    "request": "*",
+    "sax": "*",
+    "underscore": "*"
   }
 }

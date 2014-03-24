@@ -6,8 +6,12 @@
     <style>
       * { box-sizing: border-box; }
       h1 { text-align: right; }
-      #list { float: right; width: 44%; }
-      #list { padding: 0; list-style: none; }
+      #sidebar { float: right; width: 44%; min-height:30em; }
+      #list-nav a { cursor: pointer; }
+      #list-nav a:hover { cursor: pointer; text-decoration: underline; }
+      #list-nav a.current { font-weight: bold; }
+      #list { padding: 0; list-style: none; background: #eee; }
+      #list li { white-space: nowrap; overflow: hidden; padding: 0.5em; }
       #list li.current { background: #cfc; }
       #list li:hover { background: #ccf; cursor: pointer; }
       #controls { margin-bottom: 2em; }
@@ -15,10 +19,16 @@
   </head>
   <body>
     <h1>News</h1>
-    <ul id="list"></ul>
+    <div id="sidebar">
+      <div id="list-nav">
+        <a data-action="load-unread">unread</a>
+        <a data-action="load-read">read</a>
+        <a data-action="load-all">all</a>
+      </div>
+      <ul id="list"></ul>
+    </div>
     <div id="controls">
       <button data-action="flag-read">Flag read</button>
-      <button data-action="push-to-stack">Push to stack</button>
     </div>
     <div id="content"></div>
   </body>

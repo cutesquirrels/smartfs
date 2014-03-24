@@ -46,15 +46,12 @@ action "load-unread":
   filter "unread" true
   sort-by "date" desc
 
+action "load-read":
+  load news
+  filter "unread" false
+  sort-by "date" desc
+
 action "flag-read":
   load-item news
   set-flag "unread" false
   persist news
-
-# requires: stack, id
-action "push-to-stack":
-  load-item news # push datastore, pop datastore, pop id, push item
-  push-item # pop item, pop stack
-
-action "pop-from-stack":
-  pop-item # pop stack, push item
