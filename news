@@ -1,0 +1,60 @@
+
+define "sources":
+  type list
+  required
+
+define "news":
+  type datastore
+  required
+
+listen:
+  protocol http
+  port 7845
+
+task "update-news":
+  # fetches all configured sources
+  fetch sources
+  # this will explode feed results into feed items ("entries")
+  extract-feed-entries
+  # this will extend each item with { "unread": true }
+  set-flag "unread" true
+  # this will store items in the abstract document store "news"
+  persist news
+
+background:
+  # do whatever is in this block every hour. order within the block doesn't matter.
+  every hour
+  # run this task, as declared above.
+  run-task "update-news"
+
+# actions are invoked by the UI, either on behalf of the user or internally.
+# they support both request / response and command / event semantics.
+action "update":
+  run-task "update-news"
+
+action "load-all":
+  # queries the abstract document store "news"
+  load news
+  # options for the query
+  sort-by "date" desc
+
+action "load":
+  load-item news
+
+action "load-unread":
+  load news
+  filter "unread" true
+  sort-by "date" desc
+
+action "flag-read":
+  load-item news
+  set-flag "unread" false
+  persist news
+
+# requires: stack, id
+action "push-to-stack":
+  load-item news # push datastore, pop datastore, pop id, push item
+  push-item # pop item, pop stack
+
+action "pop-from-stack":
+  pop-item # pop stack, push item

@@ -1,0 +1,29 @@
+
+Implements the parser and interpreter of a non-turing-complete script language,
+designed to model common data-acquisition, mockup and presentation-related
+processing tasks.
+
+Currently it covers the following aspects:
+* Defining blocks of background processes, to be run once or periodically.
+* Associate blocks of operations with a named "action", to be run by listeners.
+* Expose actions through an HTTP (or other) interface (i.e. listeners).
+* Deployment-specific configuration through well-defined variables.
+
+Blocks of operations are lists of statements of which each statement operates on
+a stack.
+
+The example script "news" models the following application:
+* Acquire news from various sources (via RSS / Atom feeds)
+* Update those news feeds periodically
+* Provide ability for a frontend application to perform the following actions:
+  - Load all stores news entries, ordered by date ("load-all").
+  - Load all stored news entries, which have not been read yet ("load-unread").
+  - Flag a given news item as having been read ("flag-read").
+  - Load a specific news item by key ("load")
+  - Push a given news item onto a presumed "stack" for the user, being managed by
+    the backend. Stacks are named to accomodate for multiple instances of an
+    application, multiple users working at the same time and multiple contexts a
+    single user may be working in.
+  - Pop items from the stack, thus discarding them from current UI focus.
+
+All code is written in `node --harmony` compatible ECMA script.
