@@ -1,0 +1,12 @@
+{
+  "name": "smartfs",
+  "version": "0.0.1",
+  "repository": "git://github.com/cutesquirrels/smartfs.git",
+  "license": "Proprietary",
+  "dependencies": {
+    "levelup": "*",
+    "leveldown": "*",
+    "feed-read": "*",
+    "uuid": "*"
+  }
+}
