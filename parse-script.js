@@ -12,7 +12,8 @@
  * TODO: clean this up.
  */
 
-const feedRead = require('feed-read');
+const feedRead = require('./lib/feed-read');
+const datastore = require('./datastore');
 
 const fs = require('fs');
 if(process.argv.length == 2) {
@@ -167,6 +168,11 @@ input.on('end', function() {
     }
   ];
 
+  let newsStore = datastore("db/news");
+  newsStore.on('error', function(error) {
+    console.log('newsStore failed: ' + error);
+  });
+
   runScript(script, {
     sources: sources.map(function(source) {
       return {
@@ -193,20 +199,7 @@ input.on('end', function() {
         }
       };
     }),
-    news: {
-      items: [],
-      store: function(item, callback) {
-        let key = item._id || this.items.length;
-        this.items[key] = item;
-        callback(key);
-      },
-      load: function(callback) {
-        callback(this.items.slice());
-      },
-      loadItem: function(key, callback) {
-        callback(this.items[parseInt(key)]);
-      }
-    }
+    news: newsStore
   });
 });
 
@@ -322,7 +315,7 @@ function runBlock(block, script, done, args) {
       next();
       return;
     }
-    console.log('NEXT');
+    console.log('NEXT', '->', call.name);
     for(let a = (call.args.length - 1); a >= 0; a--) {
       PUSH(refValue(call.args[a], block));
     }
@@ -359,7 +352,10 @@ function runBlock(block, script, done, args) {
       {
         console.log('EXTRACT FEED ENTRIES');
         PUSH(POP().reduce(function(entries, feed) {
-          return entries.concat(feed.entries);
+          return entries.concat(feed.entries.map(function(entry) {
+            entry._id = entry.guid;
+            return entry;
+          }));
         }, []));
         next();
       }
@@ -380,8 +376,7 @@ function runBlock(block, script, done, args) {
       {
         console.log('PERSIST');
         let datastore = POP(), records = POPLIST();
-        let accumulator = function(record, key) {
-          record._id = key;
+        let accumulator = function(record) {
           this.push(record);
           if(this.length === records.length) {
             PUSH(this);
@@ -389,7 +384,10 @@ function runBlock(block, script, done, args) {
           }
         }.bind([]);
         records.forEach(function(record) {
-          datastore.store(record, accumulator.bind(this, record));
+          if(! record._id) {
+            throw new Error("Record is missing '_id': " + JSON.stringify(record));
+          }
+          datastore.store(record._id, record, accumulator.bind(this, record));
         });
       }
       break;
@@ -398,6 +396,7 @@ function runBlock(block, script, done, args) {
         console.log('LOAD');
         let datastore = POP();
         datastore.load(function(records) {
+          console.log('loaded', records.length, 'records');
           PUSH(records);
           next();
         });
